@@ -6,7 +6,7 @@ A reporting tool that creates report files for answering the following 3 questio
 
 # Pre-requisites
 The folllowing is assumed to already be installed
-* Postgres
+* Postgres + installed "news" schema
 * Python 3
 * psycopg2
 
