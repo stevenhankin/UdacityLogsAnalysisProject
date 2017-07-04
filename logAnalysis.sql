@@ -1,21 +1,30 @@
 
 /*
+    Recreate database and populate with baseline data
+*/
+DROP DATABASE IF EXISTS news;
+CREATE DATABASE news;
+\c news
+\i newsdata.sql
+
+
+/*
     Helper view to retrieve document details
     for GETS the returned genuine documents
 */
 CREATE OR REPLACE VIEW viewed_articles AS
 SELECT name,
-       ip,
+       hits,
        author,
        title
 FROM
   (SELECT regexp_replace(path,'.*article/','') AS name,
-          ip
+          count(*) AS hits
    FROM log
-   WHERE path like '%/article/%'
-     AND status = '200 OK') hits
+   WHERE path LIKE '%/article/%'
+     AND status = '200 OK'
+   GROUP BY log.path) hits
 JOIN articles ON hits.name = articles.slug ;
-
 
  
 /*
@@ -25,13 +34,9 @@ JOIN articles ON hits.name = articles.slug ;
 */
 CREATE OR REPLACE VIEW report1 AS
 SELECT '"'||title||'" - '||hits||' views' AS txt
-FROM
-  (SELECT title,
-          count(*) AS hits
-   FROM viewed_articles
-   GROUP BY title
-   ORDER BY hits DESC
-   LIMIT 3) top_hits;
+FROM viewed_articles
+ORDER BY hits DESC
+LIMIT 3;
 
 
 /*
@@ -43,7 +48,7 @@ CREATE OR REPLACE VIEW report2 AS
 SELECT name ||' - '|| views ||' views' AS txt
 FROM
   (SELECT author,
-          count(*) AS views
+          SUM(hits) AS views
    FROM viewed_articles
    GROUP BY author) hits
 JOIN authors ON author = id

@@ -4,6 +4,6 @@ __pycache__
 Vagrantfile
 catalog/
 forum/
-newsdata.*
+newsdata.sql
 tournament/
 *~
