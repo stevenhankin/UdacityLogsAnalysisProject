@@ -21,8 +21,10 @@ class ViewReporter:
         as simple as possible as per the Rubric
         """
         cur = self.conn.cursor()
-        print('Running query for view '+self.viewName, end='...', flush=True)
-        # Almost all the runtime occurs during the cursor execution
+        print('Running query for view ' + self.viewName,
+              end='...', flush=True)
+        # Almost all the runtime occurs
+        # during the cursor execution
         cur.execute("select txt from " + self.viewName)
         f = open(self.destFile, 'w')
         # Need to get the first row which also acts
@@ -32,14 +34,18 @@ class ViewReporter:
         while row:
             f.write(row[0] + '\n')
             row = cur.fetchone()
-        print('wrote data to '+self.destFile)
+        print('wrote data to ' + self.destFile)
         # Tidy up connections, etc
         f.close()
         cur.close()
         self.conn.close()
 
-# Create the report/output pairings as separate objects and run them
-# These could also be run in parallel since they are self contained
-ViewReporter("report1", "results1.txt").run()
-ViewReporter("report2", "results2.txt").run()
-ViewReporter("report3", "results3.txt").run()
+
+# Make sure the main subroutine is only run when this program is
+# executed directly, and not when it is imported as a module
+if __name__ == "__main__":
+    # Create the report/output pairings as separate objects and run them
+    # These could also be run in parallel since they are self contained
+    ViewReporter("report1", "results1.txt").run()
+    ViewReporter("report2", "results2.txt").run()
+    ViewReporter("report3", "results3.txt").run()
